@@ -18,9 +18,8 @@
     },
     "license": "GPL-3.0+",
     "require": {
-        "php": ">= 7.0, < 7.3",
-        "typo3/cms-core": "^8.7 || ^9.5",
-        "r3h6/jobqueue": "^2.0 || dev-release/TYPO3_9"
+        "typo3/cms-core": "^11.2",
+        "r3h6/jobqueue": "^2.0 || dev-release/v11"
     },
     "require-dev": {
         "nimut/testing-framework": "^4.0"
