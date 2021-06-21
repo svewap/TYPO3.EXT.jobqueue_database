@@ -1,7 +1,4 @@
 {
-    "repositories": [
-        { "type": "vcs", "url": "https://github.com/r3h6/TYPO3.EXT.jobqueue.git" }
-    ],
     "name": "r3h6/jobqueue-database",
     "type": "typo3-cms-extension",
     "description": "Database implementation of job queues for TYPO3 CMS.",
