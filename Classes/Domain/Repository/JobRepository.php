@@ -17,26 +17,28 @@ namespace R3H6\JobqueueDatabase\Domain\Repository;
 
 use R3H6\Jobqueue\Queue\Message;
 use R3H6\JobqueueDatabase\Domain\Model\Job as DatabaseJob;
-use TYPO3\CMS\Extbase\Persistence\Generic\Query;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\Generic\Query;
+use TYPO3\CMS\Extbase\Persistence\Generic\Typo3QuerySettings;
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
  * The repository for Jobs.
  */
-class JobRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class JobRepository extends Repository
 {
-    protected $defaultOrderings = array(
-        'uid' => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_ASCENDING,
-    );
+    protected $defaultOrderings = [
+        'uid' => QueryInterface::ORDER_ASCENDING,
+    ];
 
-    protected $table = 'tx_jobqueuedatabase_domain_model_job';
+    protected string $table = 'tx_jobqueuedatabase_domain_model_job';
 
     public function initializeObject()
     {
-        /** @var $querySettings \TYPO3\CMS\Extbase\Persistence\Generic\Typo3QuerySettings */
-        $querySettings = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Persistence\\Generic\\Typo3QuerySettings');
+        $querySettings = GeneralUtility::makeInstance(Typo3QuerySettings::class);
         $querySettings->setRespectStoragePage(false);
         $this->setDefaultQuerySettings($querySettings);
     }
@@ -64,8 +66,8 @@ class JobRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * WARNING: Other workers may found the same jobs.
      *          Thread savety is handled by the database queue.
      *
-     * @param  string  $queueName
-     * @param  integer $limit
+     * @param string $queueName
+     * @param integer $limit
      * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function findNextByQueueName($queueName, $limit = 1)
@@ -87,7 +89,7 @@ class JobRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
     protected function createConstraint(Query $query, $queueName)
     {
-        $constraints = array();
+        $constraints = [];
         $constraints[] = $query->equals('queueName', $queueName);
         $constraints[] = $query->equals('state', Message::STATE_PUBLISHED);
         $constraints[] = $query->logicalOr(
@@ -102,7 +104,7 @@ class JobRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     /**
      * Tries to reserve a job.
      *
-     * @param  DatabaseJob $job
+     * @param DatabaseJob $job
      * @return boolean true if job could be reserved
      */
     public function reserve(DatabaseJob $job)
@@ -116,22 +118,15 @@ class JobRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($this->table);
         $result = $queryBuilder
-           ->update($this->table)
-           ->where(
-              $queryBuilder->expr()->neq('state', $queryBuilder->createNamedParameter(Message::STATE_RESERVED, Connection::PARAM_INT)),
-              $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($job->getUid(), Connection::PARAM_INT))
-           )
-           ->set('state', Message::STATE_RESERVED)
-           ->execute();
+            ->update($this->table)
+            ->where(
+                $queryBuilder->expr()->neq('state', $queryBuilder->createNamedParameter(Message::STATE_RESERVED, Connection::PARAM_INT)),
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($job->getUid(), Connection::PARAM_INT))
+            )
+            ->set('state', Message::STATE_RESERVED)
+            ->execute();
 
         return $result === 1;
     }
 
-    /**
-     * @return \TYPO3\CMS\Core\Database\DatabaseConnection
-     */
-    protected function getDatabaseConnection()
-    {
-        return $GLOBALS['TYPO3_DB'];
-    }
 }

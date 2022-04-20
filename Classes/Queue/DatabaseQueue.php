@@ -15,9 +15,9 @@ namespace R3H6\JobqueueDatabase\Queue;
  * Public License for more details.                                       *
  *                                                                        */
 
-use R3H6\JobqueueDatabase\Domain\Model\Job as DatabaseJob;
 use R3H6\Jobqueue\Queue\Message;
 use R3H6\Jobqueue\Queue\QueueInterface;
+use R3H6\JobqueueDatabase\Domain\Model\Job as DatabaseJob;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 
 /**
@@ -26,13 +26,13 @@ use TYPO3\CMS\Core\Utility\ArrayUtility;
 class DatabaseQueue implements QueueInterface
 {
     /**
-     * @var R3H6\JobqueueDatabase\Domain\Repository\JobRepository
+     * @var \R3H6\JobqueueDatabase\Domain\Repository\JobRepository
      * @inject
      */
     protected $jobRepository = null;
 
     /**
-     * @var TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager
+     * @var \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager
      * @inject
      */
     protected $persistenceManager = null;
@@ -52,7 +52,7 @@ class DatabaseQueue implements QueueInterface
     /**
      * {@inheritdoc}
      */
-    public function __construct($name, array $options = array())
+    public function __construct($name, array $options = [])
     {
         $this->name = $name;
         ArrayUtility::mergeRecursiveWithOverrule($this->options, $options, true, false);
@@ -196,7 +196,7 @@ class DatabaseQueue implements QueueInterface
      * Converts a message to a data model.
      *
      * @param  Message $message [description]
-     * @return R3H6\JobqueueDatabase\Domain\Model\Job
+     * @return \R3H6\JobqueueDatabase\Domain\Model\Job
      */
     private function encodeJob(Message $message)
     {
@@ -213,7 +213,7 @@ class DatabaseQueue implements QueueInterface
     /**
      * Converts a data model into a message.
      *
-     * @param  R3H6\JobqueueDatabase\Domain\Model\Job $job
+     * @param  \R3H6\JobqueueDatabase\Domain\Model\Job $job
      * @return Message
      */
     private function decodeJob(DatabaseJob $job)
